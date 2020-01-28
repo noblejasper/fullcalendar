@@ -117,13 +117,38 @@ export function removeElement(el: HTMLElement) {
 // ----------------------------------------------------------------------------------------------------------------
 
 // from https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+const matchesMethod =
+  Element.prototype.matches ||
+  (Element.prototype as any).matchesSelector ||
+  (Element.prototype as any).msMatchesSelector
+
+const closestMethod = Element.prototype.closest || function (selector) {
+  // polyfill
+  let el = this
+  if (!document.documentElement.contains(el)) {
+    return null
+  }
+  do {
+    if (elementMatches(el, selector)) {
+      return el
+    }
+    el = el.parentElement || el.parentNode
+  } while (el !== null && el.nodeType === 1)
+  return null
+}
 
 export function elementClosest(el: HTMLElement, selector: string): HTMLElement {
-  return el.closest(selector)
+  if (typeof el.closest == 'function') {
+    return el.closest(selector) as HTMLElement
+  }
+  return closestMethod.call(el, selector)
 }
 
 export function elementMatches(el: HTMLElement, selector: string): boolean {
+  if (typeof el.matches === 'function') {
   return el.matches(selector)
+}
+  return matchesMethod.call(el, selector)
 }
 
 // accepts multiple subject els
