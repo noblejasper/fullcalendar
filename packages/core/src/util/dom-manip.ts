@@ -138,7 +138,7 @@ const closestMethod = Element.prototype.closest || function (selector) {
 }
 
 export function elementClosest(el: HTMLElement, selector: string): HTMLElement {
-  if (typeof el.closest == 'function') {
+  if (typeof el.closest === 'function') {
     return el.closest(selector) as HTMLElement
   }
   return closestMethod.call(el, selector)
